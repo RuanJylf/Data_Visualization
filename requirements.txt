@@ -1,0 +1,6 @@
+Flask==1.0.3
+Jinja2==2.10.1
+lxml==4.3.3
+Werkzeug==0.15.4
+pandas==0.25.3
+
