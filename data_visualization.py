@@ -17,7 +17,7 @@ class Bar(Chart):
     def add(self, *args, **kwargs):
         self.__add(*args, **kwargs)
 
-    def __add(self, name, x_axis, y_axis, is_stack=False, bar_category_gap="20%",**kwargs):
+    def __add(self, name, x_axis, y_axis, is_stack=False, bar_category_gap="20%", **kwargs):
         """
         :param name:
             系列名称，用于 tooltip 的显示，legend 的图例筛选。
@@ -92,8 +92,8 @@ def extract(data, fields, category_list, type_list):
     根据筛选出的条件, 取出符合条件的指定数据, 构造 pandas 的 Series 数据结构
     :param data: 读取Excel表中数据
     :param fields: 字段列表
-    :param category_list: 筛选后的分类列表
-    :param type_list: 筛选后的具体分类列表
+    :param category_list: 筛选后的分一级类列表
+    :param type_list: 筛选后的二级分类列表
     :return:
     """
 
@@ -116,8 +116,12 @@ def extract(data, fields, category_list, type_list):
         # 一级分类不同 取交集
         l = list(set(l).intersection(set(m)))  # 取不同分类l和m的交集
 
-    l.sort()  # 筛选后 id 排序, 便于展示
-    print("筛选后的id列表: {}".format(l))
+    # 对筛选结果进行判断
+    if l:
+        l.sort()  # 筛选后 id 排序, 便于展示
+        print("筛选后的id列表: {}".format(l))
+    else:
+        print("当前筛选条件没有对应数据, 请重新筛选!")
 
     l1 = [(round(i, 2)) for i in s1[l]]  # 取出指定ID对应的净腰围差, 且保留两位小数
     l2 = [(round(i, 2)) for i in s2[l]]  # 取出指定ID对应的净腰围, 且保留两位小数
@@ -150,7 +154,7 @@ if __name__ == "__main__":
         # 通过pyecharts的Bar类中的方法, 将筛选后的数据动态可视化
         bar = Bar()
         # 显示最大值, 最小值, 平均值, 数据缩放展示
-        bar.add('净腰围差', x, y1, mark_point=["max","min"],mark_line=["average"], is_datazoom_show=True)
-        bar.add('净腰围', x, y2, mark_point=["max","min"],mark_line=["average"], is_datazoom_show=True)
+        bar.add('净腰围差', x, y1, mark_point=["max", "min"], mark_line=["average"], is_datazoom_show=True)
+        bar.add('净腰围', x, y2, mark_point=["max", "min"], mark_line=["average"], is_datazoom_show=True)
 
         bar.render('show.html')

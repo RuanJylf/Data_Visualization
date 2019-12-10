@@ -92,8 +92,8 @@ def extract(data, fields, category_list, type_list):
     根据筛选出的条件, 取出符合条件的指定数据, 构造 pandas 的 Series 数据结构
     :param data: 读取Excel表中数据
     :param fields: 字段列表
-    :param category_list: 筛选后的分类列表
-    :param type_list: 筛选后的具体分类列表
+    :param category_list: 筛选后的分一级类列表
+    :param type_list: 筛选后的二级分类列表
     :return:
     """
 
@@ -116,8 +116,12 @@ def extract(data, fields, category_list, type_list):
         # 一级分类不同 取交集
         l = list(set(l).intersection(set(m)))  # 取不同分类l和m的交集
 
-    l.sort()  # 筛选后 id 排序, 便于展示
-    print("筛选后的id列表: {}".format(l))
+    # 对筛选结果进行判断
+    if l:
+        l.sort()  # 筛选后 id 排序, 便于展示
+        print("筛选后的id列表: {}".format(l))
+    else:
+        print("当前筛选条件没有对应数据, 请重新筛选!")
 
     l1 = [(round(i, 2)) for i in s1[l]]  # 取出指定ID对应的净腰围差, 且保留两位小数
     l2 = [(round(i, 2)) for i in s2[l]]  # 取出指定ID对应的净腰围, 且保留两位小数
