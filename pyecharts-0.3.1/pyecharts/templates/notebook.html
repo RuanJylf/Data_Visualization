@@ -1,0 +1,13 @@
+<script>
+    require.config({
+         paths:{
+           {{ config_items | join(', ') }}
+         }
+    });
+</script>
+{{ dom }}
+<script>
+    require([ {{ libraries | join(', ') }} ],function(ec){
+	{{ single_chart }}
+    });
+</script>
