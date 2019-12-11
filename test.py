@@ -17,7 +17,7 @@ class Bar(Chart):
     def add(self, *args, **kwargs):
         self.__add(*args, **kwargs)
 
-    def __add(self, name, x_axis, y_axis, is_stack=False, bar_category_gap="20%",**kwargs):
+    def __add(self, name, x_axis, y_axis, is_stack=False, bar_category_gap="20%", **kwargs):
         """
         :param name:
             系列名称，用于 tooltip 的显示，legend 的图例筛选。
@@ -154,7 +154,7 @@ if __name__ == "__main__":
         # 通过pyecharts的Bar类中的方法, 将筛选后的数据动态可视化
         bar = Bar()
         # 显示最大值, 最小值, 平均值, 数据缩放展示
-        bar.add('净腰围差', x, y1, mark_point=["max","min"],mark_line=["average"], is_datazoom_show=True)
-        bar.add('净腰围', x, y2, mark_point=["max","min"],mark_line=["average"], is_datazoom_show=True)
+        bar.add('净腰围差', x, y1, mark_point=["max", "min"], mark_line=["average"], is_datazoom_show=True)
+        bar.add('净腰围', x, y2, mark_point=["max", "min"], mark_line=["average"], is_datazoom_show=True)
 
         bar.render('show.html')
