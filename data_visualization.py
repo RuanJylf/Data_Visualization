@@ -1,8 +1,22 @@
-# 正式版
+# 测试版
 
 import pandas as pd
 from pyecharts.chart import Chart
 from pyecharts.option import get_all_options
+
+
+def values2keys(dict):
+    """取出任意字典中所有值升序排序后对应的所有键的列表形式"""
+
+    temp_list = []
+    temp_dict = {}
+    for k, v in dict.items():
+        temp_dict.setdefault(v, []).append(k)
+
+    for i in sorted(list(temp_dict.keys())):
+        for j in temp_dict[i]:
+            temp_list.append(j)
+    return temp_list
 
 
 class Bar(Chart):
@@ -58,14 +72,18 @@ class Bar(Chart):
 
 def screen():
     """
-    通过层级菜单, 筛选出指定的条件
-    :return: 返回筛选后的指定条件 category_list, type_list
+    确定x轴坐标, 通过层级菜单, 筛选指定条件
+    :return: 返回筛选后的指定条件 x_category, category_list, type_list
     """
 
     # 通过层级筛选, 确定筛选条件
     category_dict = {"1": "体型", "2": "身高", "3": "体重", "4": "腹型"}
     category_list = []
     type_list = []
+
+    # 确定x轴坐标显示的分类
+    x_category = category_dict[input("请输入x轴坐标ID{}: ".format(category_dict))]
+
     while category_dict:
         # 一级筛选
         c_id = input("请输入查询的分类ID{}: ".format(category_dict))
@@ -81,13 +99,15 @@ def screen():
             break
         else:
             print("输入的分类ID有误!!")
+
+    print("x轴坐标: {}".format(x_category))
     print("筛选的分类: {}".format(category_list))
     print("筛选的具体分类: {}".format(type_list))
 
-    return category_list, type_list
+    return x_category, category_list, type_list
 
 
-def extract(data, fields, category_list, type_list):
+def extract(data, fields, x_category, category_list, type_list):
     """
     根据筛选出的条件, 取出符合条件的指定数据, 构造 pandas 的 Series 数据结构
     :param data: 读取Excel表中数据
@@ -97,41 +117,50 @@ def extract(data, fields, category_list, type_list):
     :return:
     """
 
-    s1 = data[15][1:]  # s1 --> 净腰围差
-    s2 = data[6][1:]  # s2 --> 净腰围
+    jywc_series = data[15][1:]  # s1 --> 净腰围差
+    id_series = data[0][1:]  # id --> 所有id的Series数据
+    id_list = id_series.values  # 所有id列表
 
-    l = data[0][1:].index  # 所有的id列表
+    x_column = fields.index(x_category)  # 指定x轴的列索引值
+    x_data = data[x_column][1:]  # 根据列索引值取到对应x轴的Series数据
+    temp_dict = dict(zip(id_series.values, x_data.values))  # 构造x轴数据对应id的字典--> id: value
+
     for i in range(len(category_list)):
+
         column = fields.index(category_list[i])  # 指定类别字段的列索引值
-        s = data[column][1:]  # 根据列索引值取到对应列字段的数据
+        series = data[column][1:]  # 根据列索引值取到对应列字段的Series数据
         m = []
         # 一级分类相同, 二级分类不同, 取并集
         for j in type_list[i]:
             if category_list[i] in ["身高", "体重"]:
-                type = float(j)
+                type = int(j)
             else:
                 type = j
-            n = s[s.values == type].index  # 取出指定分类字段对应的ID
+            n = series[series.values == type].index  # 取出指定分类字段对应的ID
             m = list(set(m).union(set(n)))  # 取相同分类不同子分类的并集
         # 一级分类不同 取交集
-        l = list(set(l).intersection(set(m)))  # 取不同分类l和m的交集
+        id_list = list(set(id_list).intersection(set(m)))  # 取不同分类l和m的交集
 
     # 对筛选结果进行判断
-    if l:
-        l.sort()  # 筛选后 id 排序, 便于展示
-        print("筛选后的id列表: {}".format(l))
+    id_list.sort()
+    if id_list:
+        print("筛选后的id列表: {}".format(id_list))
     else:
         print("当前筛选条件没有对应数据, 请重新筛选!")
 
-    l1 = [(round(i, 2)) for i in s1[l]]  # 取出指定ID对应的净腰围差, 且保留两位小数
-    l2 = [(round(i, 2)) for i in s2[l]]  # 取出指定ID对应的净腰围, 且保留两位小数
+    x_dict = dict(zip(id_list, [temp_dict[i] for i in id_list]))  # 筛选后x轴数据字典
+
+    l = values2keys(x_dict)  # 筛选后x轴数据升序排列后的对应id列表
+
+    x_list = [str(temp_dict[i]) + "({})".format(i) for i in l]  # 最终x轴坐标数据显示
+
+    y_list = [(round(i, 2)) for i in jywc_series[l]]  # 取出指定ID对应的净腰围差, 且保留两位小数
 
     # 构造pandas中的Series数据结构
-    x = pd.Series(l)
-    y1 = pd.Series(l1)
-    y2 = pd.Series(l2)
+    x = pd.Series(x_list)
+    y = pd.Series(y_list)
 
-    return x, y1, y2
+    return x, y
 
 
 if __name__ == "__main__":
@@ -146,15 +175,14 @@ if __name__ == "__main__":
 
     while True:
         # 通过screen方法, 确定筛选条件
-        category_list, type_list = screen()
+        x_category, category_list, type_list = screen()
 
         # 通过extract方法, 根据筛选条件, 确定筛选后的数据, 返回Series数据类型
-        x, y1, y2 = extract(data, fields, category_list, type_list)
+        x, y= extract(data, fields, x_category, category_list, type_list)
 
         # 通过pyecharts的Bar类中的方法, 将筛选后的数据动态可视化
         bar = Bar()
         # 显示最大值, 最小值, 平均值, 数据缩放展示
-        bar.add('净腰围差', x, y1, mark_point=["max", "min"], mark_line=["average"], is_datazoom_show=True)
-        bar.add('净腰围', x, y2, mark_point=["max", "min"], mark_line=["average"], is_datazoom_show=True)
+        bar.add('净腰围差', x, y, mark_point=["max", "min"], mark_line=["average"], is_datazoom_show=True)
 
         bar.render('show.html')
