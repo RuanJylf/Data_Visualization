@@ -178,11 +178,15 @@ if __name__ == "__main__":
         x_category, category_list, type_list = screen()
 
         # 通过extract方法, 根据筛选条件, 确定筛选后的数据, 返回Series数据类型
-        x, y= extract(data, fields, x_category, category_list, type_list)
+        x, y = extract(data, fields, x_category, category_list, type_list)
+
+        tip_str = ""
+        for i in type_list:
+            tip_str += ' '.join(i) + '; '
 
         # 通过pyecharts的Bar类中的方法, 将筛选后的数据动态可视化
         bar = Bar()
         # 显示最大值, 最小值, 平均值, 数据缩放展示
-        bar.add('净腰围差', x, y, mark_point=["max", "min"], mark_line=["average"], is_datazoom_show=True)
+        bar.add('净腰围差( {})'.format(tip_str), x, y, mark_point=["max", "min"], mark_line=["average"], is_datazoom_show=True)
 
         bar.render('show.html')

@@ -178,7 +178,7 @@ if __name__ == "__main__":
         x_category, category_list, type_list = screen()
 
         # 通过extract方法, 根据筛选条件, 确定筛选后的数据, 返回Series数据类型
-        x, y= extract(data, fields, x_category, category_list, type_list)
+        x, y = extract(data, fields, x_category, category_list, type_list)
 
         # 通过pyecharts的Bar类中的方法, 将筛选后的数据动态可视化
         bar = Bar()
