@@ -101,8 +101,8 @@ def screen():
             print("输入的分类ID有误!!")
 
     print("x轴坐标: {}".format(x_category))
-    print("筛选的分类: {}".format(category_list))
-    print("筛选的具体分类: {}".format(type_list))
+    print("筛选的一级分类: {}".format(category_list))
+    print("筛选的二级分类: {}".format(type_list))
 
     return x_category, category_list, type_list
 
@@ -112,9 +112,10 @@ def extract(data, fields, x_category, category_list, type_list):
     根据筛选出的条件, 取出符合条件的指定数据, 构造 pandas 的 Series 数据结构
     :param data: 读取Excel表中数据
     :param fields: 字段列表
+    :param x_category: x轴坐标
     :param category_list: 筛选后的分一级类列表
     :param type_list: 筛选后的二级分类列表
-    :return:
+    :return: x, y
     """
 
     jywc_series = data[15][1:]  # s1 --> 净腰围差
@@ -171,7 +172,7 @@ if __name__ == "__main__":
     fields = []
     for i in range(len(data.columns)):
         fields.append(data[i][0])
-    print("所有字段列表: {}".format(fields))
+    # print("所有字段列表: {}".format(fields))
 
     while True:
         # 通过screen方法, 确定筛选条件
@@ -180,9 +181,14 @@ if __name__ == "__main__":
         # 通过extract方法, 根据筛选条件, 确定筛选后的数据, 返回Series数据类型
         x, y = extract(data, fields, x_category, category_list, type_list)
 
+        tip_str = ""
+        for i in type_list:
+            tip_str += ' '.join(i) + '; '
+
         # 通过pyecharts的Bar类中的方法, 将筛选后的数据动态可视化
         bar = Bar()
         # 显示最大值, 最小值, 平均值, 数据缩放展示
-        bar.add('净腰围差', x, y, mark_point=["max", "min"], mark_line=["average"], is_datazoom_show=True)
+        bar.add('净腰围差( {})'.format(tip_str), x, y, mark_point=["max", "min"], mark_line=["average"],
+                is_datazoom_show=True)
 
         bar.render('show.html')
