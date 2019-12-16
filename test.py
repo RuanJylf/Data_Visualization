@@ -1,4 +1,5 @@
 # 测试版
+from random import randint
 
 import pandas as pd
 from pyecharts.chart import Chart
@@ -77,32 +78,42 @@ def screen():
     """
 
     # 通过层级筛选, 确定筛选条件
-    category_dict = {"1": "体型", "2": "身高", "3": "体重", "4": "腹型"}
+    category_dict = {'1': '体型', '2': '身高', '3': '体重', '4': '腹型'}
+
+    # 循环确定x轴坐标显示的分类
+    x_id = input("请输入x轴坐标ID{}: ".format(category_dict))
+    while x_id not in category_dict.keys():
+        print("输入有误, 请重新输入!")
+        x_id = input("请输入x轴坐标ID{}: ".format(category_dict))
+    x_category = category_dict[x_id]
+
+    # 循环确定筛选条件
     category_list = []
     type_list = []
-
-    # 确定x轴坐标显示的分类
-    x_category = category_dict[input("请输入x轴坐标ID{}: ".format(category_dict))]
-
     while category_dict:
         # 一级筛选
-        c_id = input("请输入查询的分类ID{}: ".format(category_dict))
+        c_id = input("请输入一级分类ID{}: ".format(category_dict))
         if c_id in category_dict.keys():
             # 二级筛选
-            type = input("请输入具体{}, 以空格隔开: ".format(category_dict[c_id])).upper()
-            type = type.split()  # 以空格分隔字符串, 生成多条件列表
-            type_list.append(type)
+            # 若一级分类为 身高, 体重, 则进行范围筛选
+            if c_id in ['2', '3']:
+                type = input("请输入{}范围(最小值, 最大值, 以空格隔开): ".format(category_dict[c_id]))
+            # 若一级分类为 体型, 腹型, 则进行二级分类筛选
+            else:
+                type = input("请输入{}二级分类(以空格隔开): ".format(category_dict[c_id])).upper()
+            type_li = type.split()  # 以空格分隔字符串, 生成多条件列表
+            type_list.append(type_li)
             category_list.append(category_dict[c_id])
             category_dict.pop(c_id)
         # 回车键, 返回空字符串, 循环结束
         elif c_id == "":
             break
         else:
-            print("输入的分类ID有误!!")
+            print("输入有误, 请重新输入!")
 
     print("x轴坐标: {}".format(x_category))
-    print("筛选的一级分类: {}".format(category_list))
-    print("筛选的二级分类: {}".format(type_list))
+    print("一级分类: {}".format(category_list))
+    print("二级分类: {}".format(type_list))
 
     return x_category, category_list, type_list
 
@@ -126,19 +137,24 @@ def extract(data, fields, x_category, category_list, type_list):
     x_data = data[x_column][1:]  # 根据列索引值取到对应x轴的Series数据
     temp_dict = dict(zip(id_series.values, x_data.values))  # 构造x轴数据对应id的字典--> id: value
 
-    for i in range(len(category_list)):
-
+    for i in range(len(category_list)):  # i = 0;1;2;3
         column = fields.index(category_list[i])  # 指定类别字段的列索引值
         series = data[column][1:]  # 根据列索引值取到对应列字段的Series数据
         m = []
-        # 一级分类相同, 二级分类不同, 取并集
-        for j in type_list[i]:
-            if category_list[i] in ["身高", "体重"]:
-                type = int(j)
-            else:
-                type = j
-            n = series[series.values == type].index  # 取出指定分类字段对应的ID
-            m = list(set(m).union(set(n)))  # 取相同分类不同子分类的并集
+        # 若一级分类为 身高, 体重, 则遍历范围取值
+        if category_list[i] in ['身高', '体重']:
+            type_min = int(type_list[i][0])  # 范围最小值
+            type_max = int(type_list[i][1])  # 范围最大值
+            for j in range(type_min, type_max + 1):
+                n = series[series.values == j].index  # 取出指定分类字段对应的ID
+                # 一级分类相同, 二级分类不同, 取并集
+                m = list(set(m).union(set(n)))  # 取相同分类不同子分类的并集
+        else:
+            # 若一级分类为 体型, 腹型, 则遍历二级分类取值
+            for j in type_list[i]:
+                n = series[series.values == j].index  # 取出指定分类字段对应的ID
+                m = list(set(m).union(set(n)))  # 取相同分类不同子分类的并集
+
         # 一级分类不同 取交集
         id_list = list(set(id_list).intersection(set(m)))  # 取不同分类l和m的交集
 
@@ -175,6 +191,7 @@ if __name__ == "__main__":
     # print("所有字段列表: {}".format(fields))
 
     while True:
+
         # 通过screen方法, 确定筛选条件
         x_category, category_list, type_list = screen()
 
@@ -183,7 +200,7 @@ if __name__ == "__main__":
 
         tip_str = ""
         for i in type_list:
-            tip_str += ' '.join(i) + '; '
+            tip_str += '~'.join(i) + '; '
 
         # 通过pyecharts的Bar类中的方法, 将筛选后的数据动态可视化
         bar = Bar()

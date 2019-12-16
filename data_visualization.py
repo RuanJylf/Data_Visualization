@@ -5,7 +5,7 @@ from pyecharts.chart import Chart
 from pyecharts.option import get_all_options
 
 
-def values2keys(dict):
+def values2keys( dict ):
     """取出任意字典中所有值升序排序后对应的所有键的列表形式"""
 
     temp_list = []
@@ -25,13 +25,13 @@ class Bar(Chart):
     柱状/条形图，通过柱形的高度/条形的宽度来表现数据的大小。
     """
 
-    def __init__(self, title="", subtitle="", **kwargs):
+    def __init__( self, title="", subtitle="", **kwargs ):
         super(Bar, self).__init__(title, subtitle, **kwargs)
 
-    def add(self, *args, **kwargs):
+    def add( self, *args, **kwargs ):
         self.__add(*args, **kwargs)
 
-    def __add(self, name, x_axis, y_axis, is_stack=False, bar_category_gap="20%", **kwargs):
+    def __add( self, name, x_axis, y_axis, is_stack=False, bar_category_gap="20%", **kwargs ):
         """
         :param name:
             系列名称，用于 tooltip 的显示，legend 的图例筛选。
@@ -107,7 +107,7 @@ def screen():
     return x_category, category_list, type_list
 
 
-def extract(data, fields, x_category, category_list, type_list):
+def extract( data, fields, x_category, category_list, type_list ):
     """
     根据筛选出的条件, 取出符合条件的指定数据, 构造 pandas 的 Series 数据结构
     :param data: 读取Excel表中数据
