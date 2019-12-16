@@ -14,8 +14,8 @@ class Base(object):
     """
 
     def __init__(self,
-                 width=800,
-                 height=400,
+                 width=1600,
+                 height=800,
                  page_title=constants.PAGE_TITLE,
                  jshost=None):
         """

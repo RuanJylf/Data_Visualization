@@ -1,5 +1,4 @@
 # 测试版
-from random import randint
 
 import pandas as pd
 from pyecharts.chart import Chart
