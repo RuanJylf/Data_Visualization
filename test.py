@@ -145,13 +145,21 @@ def extract(data, fields, x_category, category_list, type_list):
             type_min = int(type_list[i][0])  # 范围最小值
             type_max = int(type_list[i][1])  # 范围最大值
             for j in range(type_min, type_max + 1):
-                n = series[series.values == j].index  # 取出指定分类字段对应的ID
+                type = j
+                n = series[series.values == type].index  # 取出指定分类字段对应的ID
                 # 一级分类相同, 二级分类不同, 取并集
                 m = list(set(m).union(set(n)))  # 取相同分类不同子分类的并集
-        else:
-            # 若一级分类为 体型, 腹型, 则遍历二级分类取值
+        elif category_list[i] == '体型':
+            # 若一级分类为 体型, 则遍历二级分类, 末尾加 '体'
             for j in type_list[i]:
-                n = series[series.values == j].index  # 取出指定分类字段对应的ID
+                type = j + '体'
+                n = series[series.values == type ].index  # 取出指定分类字段对应的ID
+                m = list(set(m).union(set(n)))  # 取相同分类不同子分类的并集
+        else:
+            # 若一级分类为 腹型, 则遍历二级分类取值
+            for j in type_list[i]:
+                type = j
+                n = series[series.values == type].index  # 取出指定分类字段对应的ID
                 m = list(set(m).union(set(n)))  # 取相同分类不同子分类的并集
 
         # 一级分类不同 取交集
