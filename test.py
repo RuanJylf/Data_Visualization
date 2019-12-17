@@ -129,9 +129,9 @@ def extract(data, fields, x_category, category_list, type_list):
     :return: x, y
     """
 
-    jywc_series = data[15][1:]  # 净腰围差
-    jyw_series = data[6][1:]  # 净腰围
-    id_series = data[0][1:]  # id --> 所有id的Series数据
+    jywc_series = data[15][1:]  # 净腰围差的Series数据
+    jyw_series = data[6][1:]  # 净腰围的Series数据
+    id_series = data[0][1:]  # id的Series数据
     id_list = id_series.values  # 所有id列表
 
     x_column = fields.index(x_category)  # 指定x轴的列索引值
