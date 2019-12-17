@@ -129,7 +129,8 @@ def extract(data, fields, x_category, category_list, type_list):
     :return: x, y
     """
 
-    jywc_series = data[15][1:]  # s1 --> 净腰围差
+    jywc_series = data[15][1:]  # 净腰围差
+    jyw_series = data[6][1:]  # 净腰围
     id_series = data[0][1:]  # id --> 所有id的Series数据
     id_list = id_series.values  # 所有id列表
 
@@ -179,13 +180,15 @@ def extract(data, fields, x_category, category_list, type_list):
 
     x_list = [str(temp_dict[i]) + "({})".format(i) for i in l]  # 最终x轴坐标数据显示
 
-    y_list = [(round(i, 2)) for i in jywc_series[l]]  # 取出指定ID对应的净腰围差, 且保留两位小数
+    y1_list = [(round(i, 2)) for i in jywc_series[l]]  # 取出指定ID对应的净腰围差, 且保留两位小数
+    y2_list = [(round(i, 2)) for i in jyw_series[l]]  # 取出指定ID对应的净腰围, 且保留两位小数
 
     # 构造pandas中的Series数据结构
     x = pd.Series(x_list)
-    y = pd.Series(y_list)
+    y1 = pd.Series(y1_list)
+    y2 = pd.Series(y2_list)
 
-    return x, y
+    return x, y1, y2
 
 
 if __name__ == "__main__":
@@ -204,7 +207,7 @@ if __name__ == "__main__":
         x_category, category_list, type_list = screen()
 
         # 通过extract方法, 根据筛选条件, 确定筛选后的数据, 返回Series数据类型
-        x, y = extract(data, fields, x_category, category_list, type_list)
+        x, y1, y2 = extract(data, fields, x_category, category_list, type_list)
 
         tip_str = ""
         for i in type_list:
@@ -213,7 +216,9 @@ if __name__ == "__main__":
         # 通过pyecharts的Bar类中的方法, 将筛选后的数据动态可视化
         bar = Bar()
         # 显示最大值, 最小值, 平均值, 数据缩放展示
-        bar.add('净腰围差( {})'.format(tip_str), x, y, mark_point=["max", "min"], mark_line=["average"],
+        bar.add('净腰围差( {})'.format(tip_str), x, y1, mark_point=["max", "min"], mark_line=["average"],
+                is_datazoom_show=True)
+        bar.add('净腰围( {})'.format(tip_str), x, y2, mark_point=["max", "min"], mark_line=["average"],
                 is_datazoom_show=True)
 
         bar.render('show.html')
