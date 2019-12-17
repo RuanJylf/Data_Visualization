@@ -21,9 +21,9 @@ class Base(object):
         """
 
         :param width:
-            画布宽度，默认为 800（px）
+            画布宽度，默认为 1600（px）
         :param height:
-            画布高度，默认为 400（px）
+            画布高度，默认为 800（px）
         :param page_title:
             指定生成的 html 文件中 <title> 标签的值。默认为'Echarts'
         :param jshost:
