@@ -55,7 +55,7 @@ def test_echarts_js_container():
     tpl = ECHARTS_ENV.from_string('{{ echarts_container(bar) }}')
     bar = create_demo_bar('id_demo_chart')
     html = tpl.render(bar=bar)
-    assert '<div id="id_demo_chart" style="width:800px;height:400px;"></div>' == html # flake8: noqa
+    assert '<div id="id_demo_chart" style="width:1600px;height:800px;"></div>' == html # flake8: noqa
 
     bar.width = 1024
     bar.height = 768

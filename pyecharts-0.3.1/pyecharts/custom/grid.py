@@ -13,8 +13,8 @@ class Grid(Base):
     即不能为 Pie，其他位置顺序任意。
     """
     def __init__(self, page_title=PAGE_TITLE,
-                 width=800,
-                 height=400,
+                 width=1600,
+                 height=800,
                  jshost=None):
         super(Grid, self).__init__(
             width=width, height=height, jshost=jshost

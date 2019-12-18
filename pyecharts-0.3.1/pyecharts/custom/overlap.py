@@ -12,8 +12,8 @@ class Overlap(Base):
     会画在第一个图表上。
     """
     def __init__(self, page_title=PAGE_TITLE,
-                 width=800,
-                 height=400,
+                 width=1600,
+                 height=800,
                  jshost=None):
         super(Overlap, self).__init__(
             width=width, height=height, jshost=jshost

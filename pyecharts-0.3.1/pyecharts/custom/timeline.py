@@ -10,8 +10,8 @@ class Timeline(Base):
     """
     def __init__(self, page_title=PAGE_TITLE,
                  jshost=None,
-                 width=800,
-                 height=400,
+                 width=1600,
+                 height=800,
                  is_auto_play=False,
                  is_loop_play=True,
                  is_rewind_play=False,
